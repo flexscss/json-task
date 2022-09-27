@@ -10,13 +10,29 @@ const filters = {
   }
 }
 const headers = ['ID', 'First name', 'Last name', 'Age']
+const classHandlers = {
+  age: {
+    dataCb: (data) => {
+      data = data.map((item) => {
+        return item.age
+      }).sort((a, b) => b - a)
+      const count = Math.floor(data.length / 100 * 25)
+      data = data.slice(0, count)
+      return data
+    },
+    conditionCb: (data, value) => {
+      return data.find((a) => a === value) ? 'bold' : ''
+    }
+  }
+}
 </script>
 
 <template lang="pug">
 .container
   vTable(:data="data"
          :headers="headers"
-         :filters="filters")
+         :filters="filters"
+         :classHandlers="classHandlers")
 </template>
 
 <style>

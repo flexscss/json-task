@@ -3,7 +3,8 @@ import { computed, ref } from 'vue'
 const props = defineProps({
   data: Array,
   headers: Array,
-  filters: Object
+  filters: Object,
+  classHandlers: Object
 })
 
 const sortKey = ref('lastName')
@@ -55,19 +56,23 @@ const processedData = computed(() => {
   return data
 })
 
-const boldAges = computed(() => {
-  let data = [...processedData.value]
-  data = data.map((item) => {
-    return item.age
-  }).sort((a, b) => b - a)
-  const count = Math.floor(data.length / 100 * 25)
-  data = data.slice(0, count)
-  return data
-})
+const classHandlersData = ref({})
+const startClassHandlers = () => {
+  if (props.classHandlers) {
+    for (let key in props.classHandlers) {
+      if (props.classHandlers[key] && props.classHandlers[key].dataCb) {
+        classHandlersData.value[key] = props.classHandlers[key].dataCb([...processedData.value])
+      }
+    }
+  }
+}
+startClassHandlers()
 
 const getClass = (key, value) => {
-  if (key === 'age') {
-    if (boldAges.value.find((a) => a === value)) return 'bold'
+  if (classHandlersData.value[key] &&
+    props.classHandlers[key] &&
+    props.classHandlers[key].conditionCb) {
+    return props.classHandlers[key].conditionCb(classHandlersData.value[key], value)
   }
   return false
 }
