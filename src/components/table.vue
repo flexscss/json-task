@@ -19,6 +19,8 @@ const changeSortedField = (index) => {
   sortKey.value = key
 }
 
+const isNumber = (a) => typeof a === 'number'
+
 const processedData = computed(() => {
   let data = [...props.data]
   if (props.filters) {
@@ -38,15 +40,16 @@ const processedData = computed(() => {
   }
   if (sortKey.value) {
     data.sort((a, b) => {
+      const aVal = a[sortKey.value]
+      const bVal = b[sortKey.value]
       if (sortDir.value) {
-        if (a[sortKey.value] > b[sortKey.value]) return 1
-        if (b[sortKey.value] > a[sortKey.value]) return -1
-        return 0
+        if (isNumber(aVal) && isNumber(bVal)) return aVal - bVal
+        return aVal > bVal ? 1 : -1
       } else {
-        if (a[sortKey.value] > b[sortKey.value]) return -1
-        if (b[sortKey.value] > a[sortKey.value]) return 1
-        return 0
+        if (isNumber(aVal) && isNumber(bVal)) return bVal - aVal
+        return aVal > bVal ? -1 : 1
       }
+      return 0
     })
   }
   return data
